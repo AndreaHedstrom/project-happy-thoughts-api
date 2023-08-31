@@ -62,6 +62,56 @@ app.get("/thoughts", async (req, res) => {
 
 app.post("/thoughts", async (req, res) => {
   const { message } = req.body
+  try {
+    const newThought = await new Thought({ message }).save()
+    res.status(201).json({
+      success: true,
+      response: newThought,
+      message: "New thought posted"
+    })
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      response: error,
+      message: "Error, no thought where posted."
+    })
+  }
+})
+
+app.get("/thoughts/:thoughtId", async (req, res) => {
+  const { thoughtId } = req.params
+  try {
+    const oneThought = await HappyThoughts.findById(thoughtId)
+    res.status(200).json({
+      success: true,
+      response: oneThought,
+      message: "Found the thought"
+    })
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      response: error,
+      message: "Sorry, not found."
+    })
+  }
+})
+
+app.patch("/thoughts/:thoughtId/like", async (req, res) => {
+  const { thoughtId } = req.params
+  try {
+    const newHeart = await HappyThought.findByIdUpdate(thoughtId, { $inc: { hearts: 1 } }, { new: true })
+    res.status(201).json({
+      success: true,
+      response: newHeart,
+      message: "New like!"
+    })
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      response: error,
+      message: "Sorry, could not update the like"
+    })
+  }
 })
 
 // Start the server
